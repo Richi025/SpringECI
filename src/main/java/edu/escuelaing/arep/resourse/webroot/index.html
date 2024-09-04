@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Example</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="container">
+        <img src="images.png" alt="Imagen descriptiva" class="img-responsive">
+        <h1>GET Request</h1>
+        <form action="/hello" class="form-style">
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" value="Write your name"><br><br>
+            <input type="button" value="Submit" onclick="loadGetMsg()" class="btn">
+        </form> 
+        <div id="getrespmsg" class="response-box"></div>
+
+        <h1>Sqrt Service Request</h1>
+        <form class="form-style">
+            <label for="number">Number:</label><br>
+            <input type="text" id="number" name="number" value="Enter a number"><br><br>
+            <input type="button" value="Calculate Sqrt" onclick="loadSqrtMsg()" class="btn">
+        </form>
+        <div id="sqrtrespmsg" class="response-box"></div>
+    </div>
+
+    <script>
+        function loadGetMsg() {
+            let nameVar = document.getElementById("name").value;
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                document.getElementById("getrespmsg").innerHTML = this.responseText;
+            }
+            xhttp.open("GET", "/app/hello?name=" + nameVar);
+            xhttp.send();
+        }
+
+        function loadSqrtMsg() {
+            let numberVar = document.getElementById("number").value;
+            const xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                document.getElementById("sqrtrespmsg").innerHTML = this.responseText;
+            }
+            xhttp.open("GET", "/app/sqrt?number=" + numberVar);
+            xhttp.send();
+        }
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-package edu.escuelaing.arep;
+package edu.escuelaing.arep.Example;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,7 +7,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.print.DocFlavor.STRING;
+
+import edu.escuelaing.arep.annotations.GetMapping;
+import edu.escuelaing.arep.annotations.RestController;
 
 public class SpringECI {
     public static void main(String[] args) throws ClassNotFoundException, MalformedURLException, IllegalAccessException,

@@ -1,21 +1,9 @@
 
-# MicroframeworksWebServer
+# SpringECI
 
-The project is a basic implementation of a web server in Java. The server listens on port 8080 and handles HTTP requests, both GET and POST. It supports the handling of static files and the definition of dynamic routes using a custom REST interface. The key points of the project include:
+The project provides the implementation of a basic multithreaded HTTP web server in Java that handles static and dynamic content through a simple REST framework. The framework uses custom annotations to map HTTP GET requests and parameters to methods in controller classes.
 
-**REST Interface**: Defines how requests are processed and responses are generated.
-
-**Simple Web Server**: Listens on port 8080, handles multiple connections using a thread pool, and delegates each connection to a ClientHandler.
-
-**Dynamic Routes**: Implements two routes (/hello and /echo) that respond with messages based on request parameters or data.
-
-**Static File Handling**: Serves files from a specified location in the file system.
-
-The project allows serving static content and responding to dynamic requests simply, using a basic and extensible architecture.
-
-The following image is an example of the proyect functionality.
-
- ![img.png](images/image1.png)
+ ![img.png](images/imageinit.png)
 
 ## Starting
 
@@ -42,12 +30,12 @@ In order to use the project on your system, you can access the following link an
 You can also clone the file using the following command.
 
 ```
-git clone https://github.com/Richi025/AREP-ConcurrentWebServer.git
+git clone https://github.com/Richi025/SpringECI.git 
 ```
 if you want to run the application use the command.
 
 ```
-java -jar .\target\AREP-MicroframeworksWebServer-1.0-SNAPSHOT.jar 
+java -jar .\target\SpringECI-1.0-SNAPSHOT.jar 
 ```
 
 
@@ -72,7 +60,7 @@ Once you have the cloned project in your repository. Follow the steps below to l
 4. Now you can run the project using the following command.
 
       ```
-      java -jar .\target\ARSW-MicroframeworksWebServer-1.0-SNAPSHOT.jar 
+      java -jar .\target\SpringECI-1.0-SNAPSHOT.jar 
       ```
 
 5. Once the program is running, open a browser and enter the following links.
@@ -99,99 +87,63 @@ To run the tests you can use the following Maven command
 mvn test
 ```
 
-![img.png](images/test.png)
-
 ![img.png](images/imagetest.png)
+
+![img.png](images/imagetest2.png)
+
 ### Test Descriptions
 
 1. **`testHelloServiceResponse`:**
-   - Verifies that the `/hello` service responds correctly to a GET request, returning the expected message that includes the provided name (`Hola, JohnDoe`).
+   - Verifies that the `/app/hello` service responds correctly to a GET request, returning a message that includes the provided name (`JohnDoe`). The response should match one of the expected greeting formats (e.g., "Hello JohnDoe").
 
 2. **`testLoadCSSFile`:**
-   - Checks that the server can successfully load and return a CSS file (`style.css`), ensuring the HTTP response code is 200 (OK).
+   - Checks that the server can successfully load and return a CSS file (`style.css`), ensuring the HTTP response code is 200 (OK). This test confirms that static file serving is functioning correctly.
 
-3. **`testFileNotFound`:**
-   - Ensures that the server returns a 404 (Not Found) response code when a non-existent file (`nonexistentfile.html`) is requested.
+3. **`testInvalidMethod`:**
+   - Ensures that the server correctly handles invalid HTTP methods by returning a 405 (Method Not Allowed) response code when a DELETE request is sent to the `/app/hello` endpoint, which only supports GET.
 
 4. **`testMultipleConnections`:**
-   - Evaluates the server's ability to handle multiple simultaneous connections by repeatedly requesting a static file (`index.html`) and ensuring that all requests return a 200 (OK) response code.
+   - Evaluates the server's ability to handle multiple simultaneous connections. This test submits several concurrent GET requests for the `index.html` file and checks that each request returns a 200 (OK) response code, confirming the server's robustness under load.
 
-5. **`testEchoServicePost`:**
-   - Verifies that the `/echo` service correctly processes a POST request, returning the text sent in the request body with a "Echo:" prefix.
 
 ## Arquitecture
 
-  ![img.png](images/arq.png)
+  ![img.png](images/imageArq.png)
 
 ### Components
 
-+ **Client**
++ **Client Side**: The client's browser sends HTTP GET requests through a socket.
 
-  Represents the user's browser that interacts with the web server. The client sends HTTP GET and POST requests to the server, initiating the communication for different operations, such as fetching data or submitting information.
++ **Server Side**:
+  - The server listens on port 8081.
+  - Requests are handled by the `SimpleWebServer`, which distributes requests between controllers or manages static files.
+  - Depending on the route (`/app/hello` or `/app/sqrt`), the corresponding services (`HelloService`, `SqrtService`) are called, responding dynamically.
+  - The server can also serve static files from the `webroot` directory.
 
-+ **Browser**
++ **Annotations**:
+  - The `HelloService` and `SqrtService` classes are annotated with `@RestController`, and the methods are linked with routes using `@GetMapping` and parameters through `@RequestParam`.
 
-  The component where the user interacts with the web application. It consists of two forms, each corresponding to different types of HTTP requests:
-
-  - **GET Form:** A form that sends a GET request to the server when submitted. The request is sent to the `/hello` endpoint to retrieve a response based on user input.
-  - **POST Form:** A form that sends a POST request to the server. The request is sent to the `/echo` endpoint, typically containing data in the request body that the server will process and respond to.
-
-+ **Server**
-
-  The backend component responsible for handling incoming HTTP requests, processing them, and returning the appropriate responses. It consists of several key subcomponents:
-
-  - **SimpleWebServer:8080**
-
-    The core server component that listens on port 8080 for incoming connections. It manages the initial acceptance of connections and delegates the processing to specific handlers.
-
-    - **Accepts connection:** This subcomponent listens on port 8080 and accepts incoming client connections, creating a `ClientHandler` instance to process each connection.
-
-  - **ClientHandler**
-
-    The component responsible for processing individual client requests. Each `ClientHandler` instance runs in a separate thread to handle a single connection, ensuring that the server can process multiple requests concurrently.
-
-    - **Processes GET /hello:** This handler processes GET requests sent to the `/hello` endpoint, extracting parameters from the request and generating an appropriate response.
-    - **Processes POST /echo:** This handler processes POST requests sent to the `/echo` endpoint, reading the request body and returning a response based on the data received.
-
-  - **WebServer**
-
-    A component within the server that manages routing and static file serving. It maps specific URL paths to their corresponding REST services and serves static content from the file system.
-
-    - **Matches route /hello:** Maps the `/hello` endpoint to the corresponding service that handles GET requests.
-    - **Matches route /echo:** Maps the `/echo` endpoint to the corresponding service that handles POST requests.
-
-  - **RESTService**
-
-    An interface defining the contract for REST services. Implementations of this interface handle the logic for specific endpoints, processing requests and generating responses.
-
-+ **FileSystem**
-
-  The component representing the server's file system from which static files are served. This includes HTML, CSS, images, and other resources that the client may request.
-
-  - **/static files:** The directory containing the static files that the server can serve in response to HTTP requests. The `WebServer` component accesses this directory to fulfill requests for static content.
 
 
 ## Class Diagram
 
-  ![img.png](images/class.png)
+  ![img.png](images/imageDriagramClass.png)
 
 ### Component Explanation
 
-+ **RESTService**
-  - This is an interface that defines the contract `getValue(String request, String response)` for the classes that implement it. It is used to handle REST requests and generate responses based on the request parameters.
-
 + **SimpleWebServer**
-  - This is the main class that configures and manages the web server. It listens on port 8080, accepts incoming connections, and delegates them to `ClientHandler` instances for processing. Additionally, it sets up routes and the location of static files.
+  - The main class that handles incoming connections, registers controllers, and their methods. It listens on port 8081 and manages both static and dynamic requests through controllers.
 
 + **ClientHandler**
-  - Responsible for handling individual client connections. It processes HTTP GET and POST requests, delegates specific routes to `WebServer`, and serves static files from the file system. Each `ClientHandler` instance runs in a separate thread to handle a specific connection.
+  - Responsible for processing incoming HTTP requests, either serving static files or invoking controller methods for dynamic requests. Each `ClientHandler` instance runs on a separate thread to handle specific connections.
 
-+ **WebServer**
-  - Manages the REST services and static file handling. It allows registering dynamic routes using the `RESTService` interface, extracting parameters from requests, and configuring the location of static files to be served to clients.
++ **HelloService** and **SqrtService**
+  - Controller classes annotated with `@RestController`, each handling HTTP GET requests for specific routes like `/app/hello` and `/app/sqrt`. They provide dynamic functionalities such as generating greeting messages or calculating the square root of a number.
 
-+ **RESTService Interface**
-  - Defines the contract for classes that implement REST services on the server. Implementations of this interface process requests and generate specific responses based on business logic, such as in the `/hello` and `/echo` routes.
-
++ **Annotations**
+  - **@GetMapping**: Annotation used to map HTTP GET routes to specific methods within the controllers.
+  - **@RequestParam**: Annotation that binds HTTP request parameters to method parameters, allowing values from the URL to be passed into methods.
+  - **@RestController**: Annotation to indicate that a class is a REST controller, capable of handling HTTP requests and generating responses in formats like JSON or plain text.
 
 ## Built with
 
@@ -208,7 +160,7 @@ We use [Git](https://github.com/) for version control. For available versions, s
 
 ## Date
 
-Wednesday, August 28, 2024
+Wednesday, September 04, 2024
 
 ## License
 
