@@ -72,7 +72,7 @@ Once you have the cloned project in your repository. Follow the steps below to l
 
 * http://localhost:8080/index.html
 
-  ![img.png](images/image.png)
+  ![img.png](images/imageinit.png)
 
 * http://localhost:8080/google.jpg
 
